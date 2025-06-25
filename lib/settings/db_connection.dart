@@ -2,9 +2,13 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
 class DBConnection {
-  static const version = 3; // Incrementado para reflejar cambios en el esquema (agregar tabla notificaciones)
+  static const version =
+      3; // Incrementado para reflejar cambios en el esquema (agregar tabla notificaciones)
   static const dbName = 'agenda_academica.db';
   static Future<Database> getDb() async {
+    //final dbPath = await getDatabasesPath();
+    //final path = join(dbPath, dbName);
+    //await deleteDatabase(path);
     final path = join(await getDatabasesPath(), dbName);
     return openDatabase(
       path,
@@ -20,7 +24,7 @@ class DBConnection {
             descripcion TEXT
           )
         ''');
-        
+
         // Crear tabla de materias
         await db.execute('''
           CREATE TABLE materia(
@@ -32,30 +36,27 @@ class DBConnection {
             semestre TEXT NOT NULL
           )
         ''');
-        
+
         // DATOS INICIALES
         final fechaInicio = DateTime(2025, 1, 12); // 12 de enero de 2025
-        final fechaFin = DateTime(2025, 6, 26);    // 26 de junio de 2025
-        await db.insert(
-          'periodo_academico',
-          {
-            'nombre': '8vo semestre',
-            'fechaInicio': fechaInicio.millisecondsSinceEpoch,
-            'fechaFin': fechaFin.millisecondsSinceEpoch,
-            'activo': 1,
-            'descripcion': 'Periodo académico actual',
-          },
-        );
-        
+        final fechaFin = DateTime(2025, 6, 26); // 26 de junio de 2025
+        await db.insert('periodo_academico', {
+          'nombre': '8vo semestre',
+          'fechaInicio': fechaInicio.millisecondsSinceEpoch,
+          'fechaFin': fechaFin.millisecondsSinceEpoch,
+          'activo': 1,
+          'descripcion': 'Periodo académico actual',
+        });
+
         // Insertar algunas materias de ejemplo
         await db.insert('materia', {
           'nombre': 'Desarrollo Móvil',
           'codigo': 8001,
           'descripcion': 'Desarrollo de aplicaciones móviles con Flutter',
           'horas': 64,
-          'semestre': '8vo Semestre'
+          'semestre': '8vo Semestre',
         });
-        
+
         // Crear tabla de notificaciones
         await db.execute('''
           CREATE TABLE notificacion(
@@ -67,23 +68,31 @@ class DBConnection {
             tipo TEXT NOT NULL
           )
         ''');
-        
+
         // DATOS INICIALES
         await db.insert('notificacion', {
           'titulo': 'Recordatorio de examen',
           'descripcion': 'Examen parcial de la unidad 1',
           'fechaHora': DateTime.now().toIso8601String(),
           'asignatura': 'Matemáticas',
-          'tipo': 'examen'
+          'tipo': 'examen',
         });
-        
+
         await db.insert('notificacion', {
           'titulo': 'Tarea pendiente',
           'descripcion': 'Entregar práctica de laboratorio',
           'fechaHora': DateTime.now().add(Duration(days: 2)).toIso8601String(),
           'asignatura': 'Programación',
-          'tipo': 'tarea'
+          'tipo': 'tarea',
         });
+
+        await db.execute(
+          'CREATE TABLE tareas(id INTEGER PRIMARY KEY,  tema TEXT, materiaid TEXT, descripcion TEXT, fechaentrega TEXT, horaentrega TEXT, estado INTEGER)',
+        );
+
+        await db.execute(
+          "INSERT INTO tareas VALUES(1,'Programación','001MAT','Lógica de Programación','2025-07-01','10:30',1)",
+        );
       },
     );
   }
