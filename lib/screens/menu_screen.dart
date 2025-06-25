@@ -44,7 +44,7 @@ class MenuScreen extends StatelessWidget {
             _buildMenuCard(
               icon: Icons.notifications,
               title: 'Notificaciones',
-              subtitle: 'Gestión de Notificaciones',
+              subtitle: 'Gestión de Notificacionesss',
               color: Colors.orange,
               onTap: () {
                 Navigator.pushNamed(context, '/gestionNotificaciones');
