@@ -8,7 +8,7 @@ class MenuScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Menú Principal"),
-        backgroundColor: const Color.fromARGB(255, 103, 53, 182),
+        backgroundColor: Colors.blue,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
