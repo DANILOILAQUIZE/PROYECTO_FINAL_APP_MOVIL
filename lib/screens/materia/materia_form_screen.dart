@@ -34,118 +34,154 @@ class _MateriasFormScreenState extends State<MateriasFormScreen> {
     }
   }
 
+  InputDecoration customInputDecoration(IconData icon, String label) {
+    return InputDecoration(
+      prefixIcon: Icon(icon, color: Colors.indigo.shade400),
+      labelText: label,
+      labelStyle: TextStyle(
+        color: Colors.indigo.shade400,
+        fontWeight: FontWeight.w600,
+      ),
+      filled: true,
+      fillColor: Colors.indigo.shade50,
+      contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(20),
+        borderSide: BorderSide(color: Colors.indigo.shade100, width: 1.5),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(20),
+        borderSide: BorderSide(color: Colors.indigo.shade300, width: 2.5),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(20),
+        borderSide: const BorderSide(color: Colors.redAccent, width: 2),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(20),
+        borderSide: const BorderSide(color: Colors.redAccent, width: 2),
+      ),
+    );
+  }
+
+  Widget buildTextField(
+    TextEditingController controller,
+    IconData icon,
+    String label, {
+    TextInputType keyboardType = TextInputType.text,
+    String? Function(String?)? validator,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 22),
+      child: TextFormField(
+        controller: controller,
+        keyboardType: keyboardType,
+        validator: validator,
+        decoration: customInputDecoration(icon, label),
+        style: TextStyle(
+          color: Colors.indigo.shade900,
+          fontSize: 16,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
+        backgroundColor: Colors.indigo.shade600,
+        elevation: 5,
         title: Text(
           materia == null
               ? "Insertar Materia"
               : "Actualizar ${materia!.nombre}",
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
         ),
-        backgroundColor: const Color.fromARGB(255, 36, 92, 197),
+        centerTitle: true,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 25),
         child: Form(
           key: formKey,
           child: ListView(
             children: [
-              TextFormField(
-                controller: nombreController,
+              buildTextField(
+                nombreController,
+                Icons.school,
+                "Nombre de la Materia",
                 validator:
                     (value) =>
                         value == null || value.isEmpty
                             ? 'Campo requerido'
                             : null,
-                decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.school, color: Colors.blue),
-                  labelText: "Nombre de la Materia",
-                  labelStyle: TextStyle(color: Colors.blue),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
               ),
-              SizedBox(height: 20),
-
-              TextFormField(
-                controller: codigoController,
+              buildTextField(
+                codigoController,
+                Icons.confirmation_number,
+                "Código de la Materia",
                 keyboardType: TextInputType.number,
                 validator:
                     (value) =>
                         value == null || value.isEmpty
                             ? 'Campo requerido'
                             : null,
-                decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.numbers, color: Colors.blue),
-                  labelText: "Código de la Materia",
-                  labelStyle: TextStyle(color: Colors.blue),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
               ),
-              SizedBox(height: 20),
-
-              TextFormField(
-                controller: descripcionController,
+              buildTextField(
+                descripcionController,
+                Icons.description,
+                "Descripción de la Materia",
                 validator:
                     (value) =>
                         value == null || value.isEmpty
                             ? 'Campo requerido'
                             : null,
-                decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.description, color: Colors.blue),
-                  labelText: "Descripción de la Materia",
-                  labelStyle: TextStyle(color: Colors.blue),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
               ),
-              SizedBox(height: 20),
-              // texto
-              TextFormField(
-                controller: horaController,
+              buildTextField(
+                horaController,
+                Icons.access_time,
+                "Horas semanales",
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   final hora = int.tryParse(value ?? "");
-                  if (hora == null || hora <= 0) {
-                    return "Horas incorrectas";
-                  }
+                  if (hora == null || hora <= 0) return "Horas incorrectas";
                   return null;
                 },
-                decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.access_time, color: Colors.blue),
-                  labelText: "Horas semanales",
-                  labelStyle: TextStyle(color: Colors.blue),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
               ),
-              SizedBox(height: 25),
-              // Campo Semestre
-              TextFormField(
-                controller: semestreController,
+              buildTextField(
+                semestreController,
+                Icons.calendar_today,
+                "Semestre",
                 validator:
                     (value) =>
                         value == null || value.isEmpty
                             ? 'Campo requerido'
                             : null,
-                decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.calendar_today, color: Colors.blue),
-                  labelText: "Semestre",
-                  labelStyle: TextStyle(color: Colors.blue),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+              ),
+              const SizedBox(height: 30),
+              ElevatedButton(
+                onPressed: saveMateria,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.indigo.shade600,
+                  padding: const EdgeInsets.symmetric(vertical: 18),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  elevation: 6,
+                  shadowColor: Colors.indigo.shade200,
+                ),
+                child: const Text(
+                  "Guardar",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.3,
+                    color: Colors.white,
                   ),
                 ),
               ),
-              SizedBox(height: 30),
-              // boton guardar
-              ElevatedButton(onPressed: saveMateria, child: Text("Guardar")),
             ],
           ),
         ),
