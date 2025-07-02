@@ -9,7 +9,7 @@ class DBConnection {
     
     //final dbPath = await getDatabasesPath();
     
-    77final path = join(dbPath, dbName);
+    //77final path = join(dbPath, dbName);
     //await deleteDatabase(path);
     final path = join(await getDatabasesPath(), dbName);
     return openDatabase(
