@@ -3,11 +3,12 @@ import 'package:sqflite/sqflite.dart';
 
 class DBConnection {
   static const version =
-      3; // Incrementado para reflejar cambios en el esquema (agregar tabla notificaciones)
-  static const dbName = 'agenda_academica.db';
+        3; // Incrementado para reflejar cambios en el esquema (agregar tabla notificaciones)
+          static const dbName = 'agenda_academica.db';
   static Future<Database> getDb() async {
     //final dbPath = await getDatabasesPath();
-    //final path = join(dbPath, dbName);
+    
+    //77final path = join(dbPath, dbName);
     //await deleteDatabase(path);
     final path = join(await getDatabasesPath(), dbName);
     return openDatabase(
@@ -27,17 +28,16 @@ class DBConnection {
 
         // Crear tabla de materias
         await db.execute('''
-            CREATE TABLE materia(
-              id INTEGER PRIMARY KEY AUTOINCREMENT,
-              nombre TEXT NOT NULL,
-              codigo INTEGER NOT NULL,
-              descripcion TEXT NOT NULL,
-              horas INTEGER NOT NULL,
-              semestre TEXT NOT NULL,
-              fk_periodo_id INTEGER NOT NULL,
-              FOREIGN KEY(fk_periodo_id) REFERENCES periodo_academico(id)
-            )
+          CREATE TABLE materia(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nombre TEXT NOT NULL,
+            codigo INTEGER NOT NULL,
+            descripcion TEXT NOT NULL,
+            horas INTEGER NOT NULL,
+            semestre TEXT NOT NULL
+          )
         ''');
+
 
         // DATOS INICIALES
         final fechaInicio = DateTime(2025, 1, 12); // 12 de enero de 2025
@@ -59,26 +59,33 @@ class DBConnection {
           'fk_periodo_id': 1,
         });
 
-        // Crear tabla de notificaciones
+        // Crear tabla de notificaciones 
         await db.execute('''
           CREATE TABLE notificacion(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             titulo TEXT NOT NULL,
             descripcion TEXT NOT NULL,
-            fechaHora TEXT NOT NULL,
-            asignatura TEXT NOT NULL,
-            tipo TEXT NOT NULL
+            prioridad TEXT NOT NULL,
+            categoria TEXT NOT NULL,
+            fecha TEXT NOT NULL
           )
         ''');
 
-        // DATOS INICIALES
-        await db.insert('notificacion', {
-          'titulo': 'Recordatorio de examen',
-          'descripcion': 'Examen parcial de la unidad 1',
-          'fechaHora': DateTime.now().toIso8601String(),
-          'asignatura': 'Matemáticas',
-          'tipo': 'examen',
-        });
+        await db.execute('''
+          CREATE TABLE tareas(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            tema TEXT,
+            descripcion TEXT,
+            fechaentrega TEXT,
+            horaentrega TEXT,
+            estado INTEGER,
+            fk_materia_id INTEGER NOT NULL,
+            FOREIGN KEY(fk_materia_id) REFERENCES materia(id)
+          )
+        ''');
+
+        final List<Map<String, dynamic>> materias = await db.query('materia');
+        final int materiaId = materias.first['id'];
 
         await db.insert('notificacion', {
           'titulo': 'Tarea pendiente',
@@ -88,31 +95,13 @@ class DBConnection {
           'tipo': 'tarea',
         });
 
-        await db.execute('''
-          CREATE TABLE tareas(
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            tema TEXT,
-            descripcion TEXT,
-            fechaentrega INTEGER NOT NULL,
-            horaentrega TEXT,
-            estado TEXT,
-            fk_materia_id INTEGER NOT NULL,
-            FOREIGN KEY(fk_materia_id) REFERENCES materia(id)
-          )
-        ''');
+        await db.execute(
+          'CREATE TABLE tareas(id INTEGER PRIMARY KEY,  tema TEXT, materiaid TEXT, descripcion TEXT, fechaentrega TEXT, horaentrega TEXT, estado INTEGER)',
+        );
 
-        final List<Map<String, dynamic>> materias = await db.query('materia');
-        final int materiaId = materias.first['id'];
-
-        final fechaentrega = DateTime(2025, 1, 12);
-        await db.insert('tareas', {
-          'tema': 'Programación',
-          'descripcion': 'Lógica de Programación',
-          'fechaentrega': fechaentrega.millisecondsSinceEpoch,
-          'horaentrega': '10:30',
-          'estado': 1,
-          'fk_materia_id': materiaId,
-        });
+        await db.execute(
+          "INSERT INTO tareas VALUES(1,'Programación','001MAT','Lógica de Programación','2025-07-01','10:30',1)",
+        );
       },
     );
   }
@@ -128,16 +117,10 @@ class DBConnection {
   }
 
   static Future<int> update(String tableName, dynamic data, int id) async {
-    // obtener la configuracion de la base de datos
     final db = await getDb();
-    return db.update(
-      tableName,
-      data,
-      where: 'id = ?',
-      whereArgs: [id],
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+    return db.update(tableName, data, where: 'id = ?', whereArgs: [id]);
   }
+
 
   static Future<int> delete(String tableName, int id) async {
     // obtener la configuracion de la base de datos
