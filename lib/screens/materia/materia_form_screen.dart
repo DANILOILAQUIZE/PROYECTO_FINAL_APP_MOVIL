@@ -117,7 +117,7 @@ class _MateriasFormScreenState extends State<MateriasFormScreen> {
               buildTextField(
                 nombreController,
                 Icons.school,
-                "Nombre de la Materi",
+                "Nombre de la Materia",
                 validator:
                     (value) =>
                         value == null || value.isEmpty
