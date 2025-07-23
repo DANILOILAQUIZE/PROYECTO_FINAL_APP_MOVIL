@@ -132,15 +132,12 @@ class _MenuScreenState extends State<MenuScreen> {
                   setState(() {
                     _selectedDate = date;
                   });
-                  
+
                   // Navegar a la lista de notificaciones para la fecha seleccionada
                   Navigator.pushNamed(
                     context,
                     '/gestionNotificaciones',
-                    arguments: {
-                      'selectedDate': date,
-                      'showOnlyDate': true,
-                    },
+                    arguments: {'selectedDate': date, 'showOnlyDate': true},
                   );
                 },
                 weekendTextStyle: TextStyle(color: Colors.red),
