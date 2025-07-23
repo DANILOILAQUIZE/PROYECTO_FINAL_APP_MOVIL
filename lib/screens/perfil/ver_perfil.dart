@@ -48,39 +48,6 @@ class VerPerfilScreen extends StatelessWidget {
               ),
             ),
 
-            // Título Información Académica
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: const Text(
-                'Información Académica',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blue,
-                ),
-              ),
-            ),
-
-            // Tarjeta de información académica
-            Container(
-              width: double.infinity,
-              margin: const EdgeInsets.only(bottom: 24.0),
-              padding: const EdgeInsets.all(16.0),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey.shade300),
-                borderRadius: BorderRadius.circular(8.0),
-              ),
-              child: Column(
-                children: [
-                  _buildInfoRow('Código', 'U20201F123'),
-                  _buildInfoRow('Facultad', 'Ingeniería de Sistemas'),
-                  _buildInfoRow('Escuela', 'Ingeniería de Software'),
-                  _buildInfoRow('Ciclo', '5to'),
-                ],
-              ),
-            ),
-
             // Botón de editar perfil
             SizedBox(
               width: double.infinity,
