@@ -39,7 +39,7 @@ class _MateriaListScreenState extends State<MateriaListScreen> {
           } else if (snapshot.hasError) {
             return Center(child: Text("Error: ${snapshot.error}"));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text("No existen registros"));
+            return Center(child: Text("No existen registros de Materias"));
           } else {
             final materias = snapshot.data!;
             return ListView.builder(
