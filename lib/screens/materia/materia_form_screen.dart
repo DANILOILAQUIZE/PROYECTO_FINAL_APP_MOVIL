@@ -19,19 +19,25 @@ class _MateriasFormScreenState extends State<MateriasFormScreen> {
   final horaController = TextEditingController();
   final semestreController = TextEditingController();
 
-  Materia? materia;
+  MateriaEntity? materia;
+  int? periodoId;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+
     final args = ModalRoute.of(context)?.settings.arguments;
-    if (args != null && args is Materia) {
+
+    if (args != null && args is MateriaEntity) {
       materia = args;
+      periodoId = materia!.fkPeriodoId;
       nombreController.text = materia!.nombre;
       codigoController.text = materia!.codigo.toString();
       descripcionController.text = materia!.descripcion;
       horaController.text = materia!.horas.toString();
       semestreController.text = materia!.semestre;
+    } else if (args != null && args is int) {
+      periodoId = args;
     }
   }
 
@@ -100,10 +106,12 @@ class _MateriasFormScreenState extends State<MateriasFormScreen> {
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
-          materia == null
-              ? "Insertar Materia"
-              : "Actualizar ${materia!.nombre}",
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 25, color: Colors.white),
+          materia == null ? "Insertar Materia" : "Editar ${materia!.nombre}",
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 25,
+            color: Colors.white,
+          ),
         ),
         centerTitle: true,
       ),
@@ -197,13 +205,21 @@ class _MateriasFormScreenState extends State<MateriasFormScreen> {
 
   Future<void> saveMateria() async {
     if (formKey.currentState!.validate()) {
-      final nuevaMateria = Materia(
+      if (periodoId == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Error: No se asignó un periodo.")),
+        );
+        return;
+      }
+
+      final nuevaMateria = MateriaEntity(
         id: materia?.id,
         nombre: nombreController.text,
         codigo: int.tryParse(codigoController.text) ?? 0,
         descripcion: descripcionController.text,
         horas: int.tryParse(horaController.text) ?? 0,
         semestre: semestreController.text,
+        fkPeriodoId: periodoId!,
       );
 
       if (materia == null) {
