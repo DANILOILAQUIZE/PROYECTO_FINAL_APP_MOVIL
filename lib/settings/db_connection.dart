@@ -7,10 +7,10 @@ class DBConnection {
   static const dbName = 'agenda_academica.db';
   static Future<Database> getDb() async {
     final dbPath = await getDatabasesPath();
-    final path = join(dbPath, dbName); // <-- AQUÍ defines el path correctamente
 
-    await deleteDatabase(path); // <-- AHORA puedes eliminar la base de datos
-
+    //final path = join(dbPath, dbName);
+    //await deleteDatabase(path);
+    final path = join(await getDatabasesPath(), dbName);
     return openDatabase(
       path,
       version: version,
