@@ -7,7 +7,6 @@ class DBConnection {
   static const dbName = 'agenda_academica.db';
   static Future<Database> getDb() async {
     //final dbPath = await getDatabasesPath();
-
     //final path = join(dbPath, dbName);
     //await deleteDatabase(path);
     final path = join(await getDatabasesPath(), dbName);
@@ -94,9 +93,9 @@ class DBConnection {
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             tema TEXT,
             descripcion TEXT,
-            fechaentrega TEXT,
+            fechaentrega INTEGER NOT NULL,
             horaentrega TEXT,
-            estado INTEGER,
+            estado TEXT,
             fk_materia_id INTEGER NOT NULL,
             FOREIGN KEY(fk_materia_id) REFERENCES materia(id)
           )
@@ -105,10 +104,11 @@ class DBConnection {
         final List<Map<String, dynamic>> materias = await db.query('materia');
         final int materiaId = materias.first['id'];
 
+        final fechaentrega = DateTime(2025, 1, 12);
         await db.insert('tareas', {
           'tema': 'Programación',
           'descripcion': 'Lógica de Programación',
-          'fechaentrega': '2025-07-01',
+          'fechaentrega': fechaentrega.millisecondsSinceEpoch,
           'horaentrega': '10:30',
           'estado': 1,
           'fk_materia_id': materiaId,

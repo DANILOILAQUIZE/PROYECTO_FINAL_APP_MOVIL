@@ -2,9 +2,9 @@ class Tareas {
   int? id;
   String tema;
   String descripcion;
-  String fechaentrega;
+  int fechaentrega;
   String horaentrega;
-  int estado;
+  String estado;
   int fkMateriaId;
 
   Tareas({

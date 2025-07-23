@@ -4,6 +4,7 @@ import '../../repositories/tareas_repository.dart';
 import '../app_bar.dart';
 import '../bottom_app_bar.dart';
 import '../drawer.dart';
+import 'package:intl/intl.dart';
 
 class TareaListScreen extends StatefulWidget {
   const TareaListScreen({super.key});
@@ -64,34 +65,170 @@ class _TareaListScreen extends State<TareaListScreen> {
                       itemCount: tareas.length,
                       itemBuilder: (context, index) {
                         final tarea = tareas[index];
-                        return ListTile(
-                          title: Text(tarea.tema),
-
-                          subtitle: Text(
-                            "Tema: ${tarea.tema} -> Descripción: ${tarea.descripcion} -> Fecha Entrega: ${tarea.fechaentrega} -> Estado: ${tarea.estado.toStringAsFixed(0)}",
+                        return Card(
+                          elevation: 6,
+                          margin: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 10,
                           ),
-                          trailing: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              IconButton(
-                                onPressed: () {
-                                  Navigator.pushNamed(
-                                    context,
-                                    "/tareas/form",
-                                    arguments: tarea,
-                                  ).then(
-                                    (_) => setState(() {
-                                      _loadTareas();
-                                    }),
-                                  );
-                                },
-                                icon: Icon(Icons.edit, color: Colors.orange),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          color: Colors.indigo.shade50,
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(20),
+                            onTap: () {},
+
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 10,
+                                horizontal: 8,
                               ),
-                              IconButton(
-                                onPressed: () => eliminar(tarea),
-                                icon: Icon(Icons.delete, color: Colors.red),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          shape: BoxShape.circle,
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.indigo.withOpacity(
+                                                0.15,
+                                              ),
+                                              blurRadius: 8,
+                                              offset: Offset(0, 4),
+                                            ),
+                                          ],
+                                        ),
+                                        padding: const EdgeInsets.all(10),
+                                        child: Icon(
+                                          Icons.school,
+                                          color: Colors.indigo.shade700,
+                                          size: 30,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      SizedBox(
+                                        width: 70,
+                                        child: Text(
+                                          tarea.tema,
+                                          style: TextStyle(
+                                            color: Colors.indigo.shade900,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 15,
+                                            letterSpacing: 0.5,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(width: 18),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          "Tema: ${tarea.tema}",
+                                          style: TextStyle(
+                                            color: Colors.indigo.shade400,
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          "Descripcion: ${tarea.descripcion}",
+                                          style: TextStyle(
+                                            color: Colors.indigo.shade400,
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 2),
+
+                                        Text(
+                                          "Estado: ${tarea.estado}",
+                                          style: TextStyle(
+                                            color: Colors.indigo.shade400,
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          "Fecha Entrega: ${DateFormat('dd/MM/yyyy').format(DateTime.fromMillisecondsSinceEpoch(tarea.fechaentrega))}",
+                                          style: TextStyle(
+                                            color: Colors.indigo.shade400,
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          color: Colors.green.shade50,
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                        ),
+                                        child: IconButton(
+                                          onPressed: () {
+                                            Navigator.pushNamed(
+                                              context,
+                                              "/tareas/form",
+                                              arguments:
+                                                  tarea, // <-- pasas la entidad completa
+                                            ).then((_) {
+                                              setState(() {
+                                                _loadTareas();
+                                              });
+                                            });
+                                          },
+
+                                          icon: Icon(
+                                            Icons.edit,
+                                            color: Colors.green.shade700,
+                                          ),
+                                          tooltip: 'Editar',
+                                        ),
+                                      ),
+                                      const SizedBox(width: 6),
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          color: Colors.red.shade50,
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                        ),
+                                        child: IconButton(
+                                          onPressed: () => eliminar(tarea),
+                                          icon: Icon(
+                                            Icons.delete,
+                                            color: Colors.red.shade700,
+                                          ),
+                                          tooltip: 'Eliminar',
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
                               ),
-                            ],
+                            ),
                           ),
                         );
                       },
@@ -120,7 +257,7 @@ class _TareaListScreen extends State<TareaListScreen> {
           }
         },
         shape: CircleBorder(),
-        backgroundColor: Colors.green,
+        backgroundColor: Colors.indigo.shade600,
         child: Icon(Icons.add, color: Colors.white),
       ),
     );
