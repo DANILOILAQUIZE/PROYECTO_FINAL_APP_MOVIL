@@ -15,6 +15,7 @@ class PeriodosScreen extends StatefulWidget {
 
 class _PeriodosScreenState extends State<PeriodosScreen> {
   late Future<List<PeriodoEntity>> listPeriodos;
+
   @override
   void initState() {
     super.initState();
@@ -47,6 +48,7 @@ class _PeriodosScreenState extends State<PeriodosScreen> {
         );
       },
     );
+
     if (respuesta == true) {
       await PeriodoRepository.delete(periodo);
       setState(() {
@@ -64,22 +66,15 @@ class _PeriodosScreenState extends State<PeriodosScreen> {
       body: FutureBuilder<List<PeriodoEntity>>(
         future: listPeriodos,
         builder: (context, snapshot) {
-          // validar si esta aun consultando los datos
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
-          }
-          // validar si hubo un error
-          else if (snapshot.hasError) {
+          } else if (snapshot.hasError) {
             return Center(
               child: Text('Error al cargar los periodos. ${snapshot.error}'),
             );
-          }
-          // validar si consulta OK pero no hay datos
-          else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return Center(child: Text('No hay datos'));
-          }
-          // validar si consulta OK y hay datos
-          else {
+          } else {
             final periodos = snapshot.data!;
             return ListView.builder(
               itemCount: periodos.length,
@@ -95,125 +90,135 @@ class _PeriodosScreenState extends State<PeriodosScreen> {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   color: Colors.indigo.shade50,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 10,
-                      horizontal: 8,
-                    ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                shape: BoxShape.circle,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.indigo.withOpacity(0.15),
-                                    blurRadius: 8,
-                                    offset: Offset(0, 4),
-                                  ),
-                                ],
-                              ),
-                              padding: const EdgeInsets.all(10),
-                              child: Icon(
-                                Icons.date_range,
-                                color: Colors.indigo.shade700,
-                                size: 30,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            SizedBox(
-                              width: 70,
-                              child: Text(
-                                periodo.nombre,
-                                style: TextStyle(
-                                  color: Colors.indigo.shade900,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 15,
-                                  letterSpacing: 0.5,
-                                ),
-                                textAlign: TextAlign.center,
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(width: 18),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(20),
+                    onTap: () {
+                      Navigator.pushNamed(
+                        context,
+                        '/gestionMaterias',
+                        arguments: periodo.id,
+                      );
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 10,
+                        horizontal: 8,
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Column(
+                            mainAxisSize: MainAxisSize.min,
                             children: [
-                              Text(
-                                "Inicio: ${DateFormat('dd/MM/yyyy').format(DateTime.fromMillisecondsSinceEpoch(periodo.fechaInicio))}",
-                                style: TextStyle(
-                                  color: Colors.indigo.shade400,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  shape: BoxShape.circle,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.indigo.withOpacity(0.15),
+                                      blurRadius: 8,
+                                      offset: Offset(0, 4),
+                                    ),
+                                  ],
+                                ),
+                                padding: const EdgeInsets.all(10),
+                                child: Icon(
+                                  Icons.date_range,
+                                  color: Colors.indigo.shade700,
+                                  size: 30,
                                 ),
                               ),
-                              const SizedBox(height: 2),
-                              Text(
-                                "Fin: ${DateFormat('dd/MM/yyyy').format(DateTime.fromMillisecondsSinceEpoch(periodo.fechaFin))}",
-                                style: TextStyle(
-                                  color: Colors.indigo.shade400,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
+                              const SizedBox(height: 8),
+                              SizedBox(
+                                width: 70,
+                                child: Text(
+                                  periodo.nombre,
+                                  style: TextStyle(
+                                    color: Colors.indigo.shade900,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 15,
+                                    letterSpacing: 0.5,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ),
                             ],
                           ),
-                        ),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                color: Colors.green.shade50,
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: IconButton(
-                                onPressed: () {
-                                  Navigator.pushNamed(
-                                    context,
-                                    '/agregarPeriodo',
-                                    arguments: periodo,
-                                  ).then((_) {
-                                    setState(() {
-                                      _loadPeriodos();
+                          const SizedBox(width: 18),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  "Inicio: ${DateFormat('dd/MM/yyyy').format(DateTime.fromMillisecondsSinceEpoch(periodo.fechaInicio))}",
+                                  style: TextStyle(
+                                    color: Colors.indigo.shade400,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  "Fin: ${DateFormat('dd/MM/yyyy').format(DateTime.fromMillisecondsSinceEpoch(periodo.fechaFin))}",
+                                  style: TextStyle(
+                                    color: Colors.indigo.shade400,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.green.shade50,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: IconButton(
+                                  onPressed: () {
+                                    Navigator.pushNamed(
+                                      context,
+                                      '/agregarPeriodo',
+                                      arguments: periodo,
+                                    ).then((_) {
+                                      setState(() {
+                                        _loadPeriodos();
+                                      });
                                     });
-                                  });
-                                },
-                                icon: Icon(
-                                  Icons.edit,
-                                  color: Colors.green.shade700,
+                                  },
+                                  icon: Icon(
+                                    Icons.edit,
+                                    color: Colors.green.shade700,
+                                  ),
+                                  tooltip: 'Editar',
                                 ),
-                                tooltip: 'Editar',
                               ),
-                            ),
-                            const SizedBox(width: 6),
-                            Container(
-                              decoration: BoxDecoration(
-                                color: Colors.red.shade50,
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: IconButton(
-                                onPressed: () => eliminarPeriodo(periodo),
-                                icon: Icon(
-                                  Icons.delete,
-                                  color: Colors.red.shade700,
+                              const SizedBox(width: 6),
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.red.shade50,
+                                  borderRadius: BorderRadius.circular(12),
                                 ),
-                                tooltip: 'Eliminar',
+                                child: IconButton(
+                                  onPressed: () => eliminarPeriodo(periodo),
+                                  icon: Icon(
+                                    Icons.delete,
+                                    color: Colors.red.shade700,
+                                  ),
+                                  tooltip: 'Eliminar',
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                      ],
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 );
