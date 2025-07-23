@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../entities/materia_entity.dart';
 import '../../repositories/materia_repository.dart';
+import '../app_bar.dart';
+import '../bottom_app_bar.dart';
+import '../drawer.dart';
 
 class MateriaListScreen extends StatefulWidget {
   const MateriaListScreen({super.key});
@@ -25,7 +28,9 @@ class _MateriaListScreenState extends State<MateriaListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Listado de Materias")),
+      drawer: const CustomDrawer(),
+      appBar: const CustomAppBar(title: "Materias"),
+      bottomNavigationBar: const BottomFooter(),
       body: FutureBuilder<List<Materia>>(
         future: _listMaterias,
         builder: (context, snapshot) {
@@ -42,34 +47,125 @@ class _MateriaListScreenState extends State<MateriaListScreen> {
               itemBuilder: (context, index) {
                 final materia = materias[index];
                 return Card(
-                  elevation: 3,
-                  margin: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                  child: ListTile(
-                    leading: Icon(Icons.school, color: Colors.deepPurple),
-                    title: Text(materia.nombre),
-                    subtitle: Text(
-                      "Código: ${materia.codigo} |  Semestre: ${materia.semestre}  |  Horas: ${materia.horas}",
-                    ),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
+                  elevation: 6,
+                  margin: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  color: Colors.indigo.shade50,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        IconButton(
-                          onPressed: () {
-                            Navigator.pushNamed(
-                              context,
-                              "/materias/form",
-                              arguments: materia,
-                            ).then((_) {
-                              setState(() {
-                                _loadMaterias();
-                              });
-                            });
-                          },
-                          icon: Icon(Icons.edit, color: Colors.green),
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.indigo.withOpacity(0.15),
+                                    blurRadius: 8,
+                                    offset: Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              padding: const EdgeInsets.all(10),
+                              child: Icon(Icons.school, color: Colors.indigo.shade700, size: 30),
+                            ),
+                            const SizedBox(height: 8),
+                            SizedBox(
+                              width: 70,
+                              child: Text(
+                                materia.nombre,
+                                style: TextStyle(
+                                  color: Colors.indigo.shade900,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15,
+                                  letterSpacing: 0.5,
+                                ),
+                                textAlign: TextAlign.center,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
                         ),
-                        IconButton(
-                          onPressed: () => eliminar(materia),
-                          icon: Icon(Icons.delete, color: Colors.red),
+                        const SizedBox(width: 18),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "Código: ${materia.codigo}",
+                                style: TextStyle(
+                                  color: Colors.indigo.shade400,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                "Semestre: ${materia.semestre}",
+                                style: TextStyle(
+                                  color: Colors.indigo.shade400,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                "Horas: ${materia.horas}",
+                                style: TextStyle(
+                                  color: Colors.indigo.shade400,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.green.shade50,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: IconButton(
+                                onPressed: () {
+                                  Navigator.pushNamed(
+                                    context,
+                                    "/materias/form",
+                                    arguments: materia,
+                                  ).then((_) {
+                                    setState(() {
+                                      _loadMaterias();
+                                    });
+                                  });
+                                },
+                                icon: Icon(Icons.edit, color: Colors.green.shade700),
+                                tooltip: 'Editar',
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.red.shade50,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: IconButton(
+                                onPressed: () => eliminar(materia),
+                                icon: Icon(Icons.delete, color: Colors.red.shade700),
+                                tooltip: 'Eliminar',
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -88,8 +184,8 @@ class _MateriaListScreenState extends State<MateriaListScreen> {
             });
           });
         },
+        backgroundColor: Colors.indigo,
         child: Icon(Icons.add, color: Colors.white),
-        backgroundColor: Color.fromARGB(255, 31, 64, 155),
       ),
     );
   }

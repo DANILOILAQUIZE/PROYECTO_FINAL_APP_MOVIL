@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../entities/materia_entity.dart';
 import '../../repositories/materia_repository.dart';
+import '../bottom_app_bar.dart';
 
 class MateriasFormScreen extends StatefulWidget {
   const MateriasFormScreen({super.key});
@@ -94,14 +95,19 @@ class _MateriasFormScreenState extends State<MateriasFormScreen> {
       appBar: AppBar(
         backgroundColor: Colors.indigo.shade600,
         elevation: 5,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
         title: Text(
           materia == null
               ? "Insertar Materia"
               : "Actualizar ${materia!.nombre}",
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 25, color: Colors.white),
         ),
         centerTitle: true,
       ),
+      bottomNavigationBar: const BottomFooter(),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 25),
         child: Form(

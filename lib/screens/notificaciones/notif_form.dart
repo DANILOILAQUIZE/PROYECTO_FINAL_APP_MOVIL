@@ -23,8 +23,6 @@ class _NotificacionFormScreenState extends State<NotificacionFormScreen> {
   DateTime fechaSeleccionada = DateTime.now();
   TimeOfDay horaSeleccionada = TimeOfDay.now();
 
-  final tipoController = TextEditingController();
-
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -43,7 +41,6 @@ class _NotificacionFormScreenState extends State<NotificacionFormScreen> {
       
       _actualizarFechaHoraController();
     } else {
-      // Inicializar sin valores por defecto
       _actualizarFechaHoraController();
     }
   }
@@ -83,112 +80,130 @@ class _NotificacionFormScreenState extends State<NotificacionFormScreen> {
     }
   }
 
-  // No necesitamos el selector de hora
+  InputDecoration customInputDecoration(IconData icon, String label) {
+    return InputDecoration(
+      prefixIcon: Icon(icon, color: Colors.orange.shade400),
+      labelText: label,
+      labelStyle: TextStyle(
+        color: Colors.orange,
+        fontWeight: FontWeight.w600,
+      ),
+      filled: true,
+      fillColor: Colors.orange.shade50,
+      contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(20),
+        borderSide: BorderSide(color: Colors.orange.shade100, width: 1.5),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(20),
+        borderSide: BorderSide(color: Colors.orange.shade300, width: 2.5),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(20),
+        borderSide: const BorderSide(color: Colors.redAccent, width: 2),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(20),
+        borderSide: const BorderSide(color: Colors.redAccent, width: 2),
+      ),
+    );
+  }
+
+  Widget buildTextField(
+    TextEditingController controller,
+    IconData icon,
+    String label, {
+    TextInputType keyboardType = TextInputType.text,
+    String? Function(String?)? validator,
+    int? maxLines = 1,
+    VoidCallback? onTap,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 22),
+      child: TextFormField(
+        controller: controller,
+        keyboardType: keyboardType,
+        validator: validator,
+        maxLines: maxLines,
+        onTap: onTap,
+        decoration: customInputDecoration(icon, label),
+        style: TextStyle(
+          color: Colors.orange,
+          fontSize: 16,
+          fontWeight: FontWeight.w500,
+        ),
+        readOnly: onTap != null,
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          notificacion == null
-              ? "Nueva Notificación"
-              : "Editar Notificación",
-        ),
-        backgroundColor: const Color.fromARGB(255, 36, 92, 197),
+        title: Text(notificacion == null ? 'Crear Notificación' : 'Editar Notificación'),
+        backgroundColor: Colors.orange,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 25),
         child: Form(
           key: formKey,
           child: ListView(
             children: [
-              TextFormField(
-                controller: tituloController,
+              buildTextField(
+                tituloController,
+                Icons.title,
+                "Título de la Notificación",
                 validator: (value) => 
                     value == null || value.isEmpty 
                         ? 'Campo requerido' 
                         : null,
-                decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.title, color: Colors.blue),
-                  labelText: "Título de la Notificación",
-                  labelStyle: TextStyle(color: Colors.blue),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
               ),
-              SizedBox(height: 20),
               
-              TextFormField(
-                controller: descripcionController,
+              buildTextField(
+                descripcionController,
+                Icons.description,
+                "Descripción",
                 maxLines: 4,
                 validator: (value) => 
                     value == null || value.isEmpty 
                         ? 'Campo requerido' 
                         : null,
-                decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.description, color: Colors.blue),
-                  labelText: "Descripción",
-                  labelStyle: TextStyle(color: Colors.blue),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
               ),
-              SizedBox(height: 20),
               
-              TextFormField(
-                controller: asignaturaController,
+              buildTextField(
+                asignaturaController,
+                Icons.school,
+                "Asignatura",
                 validator: (value) => 
                     value == null || value.isEmpty 
                         ? 'Campo requerido' 
                         : null,
-                decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.school, color: Colors.blue),
-                  labelText: "Asignatura",
-                  labelStyle: TextStyle(color: Colors.blue),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
               ),
-              SizedBox(height: 20),
               
-              TextFormField(
-                controller: tipoNotificacionController,
+              buildTextField(
+                tipoNotificacionController,
+                Icons.category,
+                "Tipo de Notificación",
                 validator: (value) => 
                     value == null || value.isEmpty 
                         ? 'Campo requerido' 
                         : null,
-                decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.category, color: Colors.blue),
-                  labelText: "Tipo de Notificación",
-                  labelStyle: TextStyle(color: Colors.blue),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  hintText: "Ej: Tarea, Examen, Recordatorio",
-                ),
               ),
-              SizedBox(height: 20),
               
-              TextFormField(
-                controller: fechaHoraController,
-                readOnly: true,
-                onTap: () async {
-                  await _seleccionarFecha(context);
-                },
-                decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.calendar_today, color: Colors.blue),
-                  labelText: "Fecha y Hora",
-                  labelStyle: TextStyle(color: Colors.blue),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
+              buildTextField(
+                fechaHoraController,
+                Icons.calendar_today,
+                "Fecha (dd/MM/yyyy)",
+                validator: (value) => 
+                    value == null || value.isEmpty 
+                        ? 'Campo requerido' 
+                        : null,
+                onTap: () => _seleccionarFecha(context),
               ),
-              SizedBox(height: 30),
               
+              const SizedBox(height: 30),
               ElevatedButton(
                 onPressed: () async {
                   if (formKey.currentState!.validate()) {
@@ -232,15 +247,22 @@ class _NotificacionFormScreenState extends State<NotificacionFormScreen> {
                   }
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color.fromARGB(255, 36, 92, 197),
-                  padding: EdgeInsets.symmetric(vertical: 15),
+                  backgroundColor: Colors.orange,
+                  padding: const EdgeInsets.symmetric(vertical: 18),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(30),
                   ),
+                  elevation: 6,
+                  shadowColor: Colors.orange.shade200,
                 ),
                 child: Text(
                   esEdicion ? 'Actualizar' : 'Guardar',
-                  style: TextStyle(fontSize: 16, color: Colors.white),
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.3,
+                    color: Colors.white,
+                  ),
                 ),
               ),
             ],

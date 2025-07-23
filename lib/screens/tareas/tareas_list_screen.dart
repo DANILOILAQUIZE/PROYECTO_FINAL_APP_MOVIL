@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-
 import '../../entities/tareas_entity.dart';
 import '../../repositories/tareas_repository.dart';
+import '../app_bar.dart';
+import '../bottom_app_bar.dart';
+import '../drawer.dart';
 
 
 class TareaListScreen extends StatefulWidget {
@@ -28,7 +30,9 @@ class _TareaListScreen extends State<TareaListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Listado de Tareas")),
+      drawer: const CustomDrawer(),
+      appBar: const CustomAppBar(title: "Tareas"),
+      bottomNavigationBar: const BottomFooter(),
       body: FutureBuilder<List<Tareas>>(
         future: _listTareas,
         builder: (context, snapshot) {
@@ -94,8 +98,8 @@ class _TareaListScreen extends State<TareaListScreen> {
           );
         },
         shape: CircleBorder(),
-        child: Icon(Icons.add, color: Colors.white),
         backgroundColor: Colors.green,
+        child: Icon(Icons.add, color: Colors.white),
       ),
     );
   }
