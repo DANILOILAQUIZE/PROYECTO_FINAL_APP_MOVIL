@@ -2,101 +2,72 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
 class DBConnection {
-  static const version =
-      3; // Incrementado para reflejar cambios en el esquema (agregar tabla notificaciones)
-  static const dbName = 'agenda_academica.db';
-  static Future<Database> getDb() async {
-    
-    //final dbPath = await getDatabasesPath();
-    
-    //77final path = join(dbPath, dbName);
-    //await deleteDatabase(path);
-    final path = join(await getDatabasesPath(), dbName);
-    return openDatabase(
+  static const version = 1;
+  static const dbName = 'agenda_academica_clean.db';
+
+  static Future<Database> _createDatabase(String path, int version) async {
+    return await openDatabase(
       path,
       version: version,
-      onCreate: (db, _) async {
-        await db.execute('''
-          CREATE TABLE periodo_academico(
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            nombre TEXT NOT NULL,
-            fechaInicio INTEGER NOT NULL,
-            fechaFin INTEGER NOT NULL,
-            activo BOOLEAN NOT NULL DEFAULT 0,
-            descripcion TEXT
-          )
-        ''');
-
-        // Crear tabla de materias
-        await db.execute('''
-          CREATE TABLE materia(
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            nombre TEXT NOT NULL,
-            codigo INTEGER NOT NULL,
-            descripcion TEXT NOT NULL,
-            horas INTEGER NOT NULL,
-            semestre TEXT NOT NULL
-          )
-        ''');
-
-        // DATOS INICIALES
-        final fechaInicio = DateTime(2025, 1, 12); // 12 de enero de 2025
-        final fechaFin = DateTime(2025, 6, 26); // 26 de junio de 2025
-        await db.insert('periodo_academico', {
-          'nombre': '8vo semestre',
-          'fechaInicio': fechaInicio.millisecondsSinceEpoch,
-          'fechaFin': fechaFin.millisecondsSinceEpoch,
-          'activo': 1,
-          'descripcion': 'Periodo académico actual',
-        });
-
-        // Insertar algunas materias de ejemplo
-        await db.insert('materia', {
-          'nombre': 'Desarrollo Móvil',
-          'codigo': 8001,
-          'descripcion': 'Desarrollo de aplicaciones móviles con Flutter',
-          'horas': 64,
-          'semestre': '8vo Semestre',
-        });
-
-        // Crear tabla de notificaciones
-        await db.execute('''
-          CREATE TABLE notificacion(
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            titulo TEXT NOT NULL,
-            descripcion TEXT NOT NULL,
-            fechaHora TEXT NOT NULL,
-            asignatura TEXT NOT NULL,
-            tipo TEXT NOT NULL
-          )
-        ''');
-
-        // DATOS INICIALES
-        await db.insert('notificacion', {
-          'titulo': 'Recordatorio de examen',
-          'descripcion': 'Examen parcial de la unidad 1',
-          'fechaHora': DateTime.now().toIso8601String(),
-          'asignatura': 'Matemáticas',
-          'tipo': 'examen',
-        });
-
-        await db.insert('notificacion', {
-          'titulo': 'Tarea pendiente',
-          'descripcion': 'Entregar práctica de laboratorio',
-          'fechaHora': DateTime.now().add(Duration(days: 2)).toIso8601String(),
-          'asignatura': 'Programación',
-          'tipo': 'tarea',
-        });
-
-        await db.execute(
-          'CREATE TABLE tareas(id INTEGER PRIMARY KEY,  tema TEXT, materiaid TEXT, descripcion TEXT, fechaentrega TEXT, horaentrega TEXT, estado INTEGER)',
-        );
-
-        await db.execute(
-          "INSERT INTO tareas VALUES(1,'Programación','001MAT','Lógica de Programación','2025-07-01','10:30',1)",
-        );
+      onCreate: (db, version) {
+        return _onCreate(db, version);
       },
     );
+  }
+
+  static Future<void> _onCreate(Database db, int version) async {
+    // Crear tabla de periodos académicos
+    await db.execute('''
+      CREATE TABLE periodo_academico(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        nombre TEXT NOT NULL,
+        fecha_inicio TEXT NOT NULL,
+        fecha_fin TEXT NOT NULL,
+        estado TEXT NOT NULL
+      )
+    ''');
+
+    // Crear tabla de notificaciones - ESTRUCTURA LIMPIA
+    await db.execute('''
+      CREATE TABLE notificacion(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        titulo TEXT NOT NULL,
+        descripcion TEXT NOT NULL,
+        prioridad TEXT NOT NULL,
+        categoria TEXT NOT NULL,
+        fecha TEXT NOT NULL
+      )
+    ''');
+
+    // Crear tabla de materias
+    await db.execute('''
+      CREATE TABLE materia(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        nombre TEXT NOT NULL,
+        codigo INTEGER NOT NULL,
+        descripcion TEXT NOT NULL,
+        horas INTEGER NOT NULL,
+        semestre TEXT NOT NULL
+      )
+    ''');
+
+    // Crear tabla de tareas
+    await db.execute('''
+      CREATE TABLE tareas(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        tema TEXT,
+        materiaid TEXT,
+        descripcion TEXT,
+        fechaentrega TEXT,
+        horaentrega TEXT,
+        estado INTEGER
+      )
+    ''');
+  }
+
+  static Future<Database> getDb() async {
+    final path = join(await getDatabasesPath(), dbName);
+    return _createDatabase(path, version);
   }
 
   static Future<int> insert(String tableName, dynamic data) async {

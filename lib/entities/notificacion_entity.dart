@@ -2,17 +2,17 @@ class Notificacion {
   int? id;
   String titulo;
   String descripcion;
-  DateTime fechaHora;
-  String asignatura; // Nombre de la asignatura relacionada
-  String tipo; // Ejemplo: 'tarea', 'recordatorio', 'importante', etc.
+  String prioridad; // 'alta', 'importante', 'media', 'baja'
+  String categoria; // 'trabajo', 'personal', 'estudio'
+  DateTime fecha; // Fecha específica del día
 
   Notificacion({
     this.id,
     required this.titulo,
     required this.descripcion,
-    required this.fechaHora,
-    required this.asignatura,
-    required this.tipo,
+    required this.prioridad,
+    required this.categoria,
+    required this.fecha,
   });
 
   // Convierte la instancia de Notificacion en un mapa
@@ -21,9 +21,10 @@ class Notificacion {
       'id': id,
       'titulo': titulo,
       'descripcion': descripcion,
-      'fechaHora': fechaHora.toIso8601String(),
-      'asignatura': asignatura,
-      'tipo': tipo,
+      'prioridad': prioridad,
+      'categoria': categoria,
+      'fecha':
+          fecha.toIso8601String().split('T')[0], // Solo la fecha (YYYY-MM-DD)
     };
   }
 
@@ -33,9 +34,11 @@ class Notificacion {
       id: data['id'],
       titulo: data['titulo'],
       descripcion: data['descripcion'],
-      fechaHora: DateTime.parse(data['fechaHora']),
-      asignatura: data['asignatura'] ?? '',
-      tipo: data['tipo'],
+      prioridad: data['prioridad'] ?? 'media',
+      categoria: data['categoria'] ?? 'trabajo',
+      fecha: DateTime.parse(
+        data['fecha'] + 'T00:00:00',
+      ), // Convertir a DateTime
     );
   }
 }

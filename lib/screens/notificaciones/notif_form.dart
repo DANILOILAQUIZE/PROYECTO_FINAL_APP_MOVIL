@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import '../../entities/notificacion_entity.dart';
 import '../../repositories/notificacion_repository.dart';
 
@@ -14,80 +13,66 @@ class _NotificacionFormScreenState extends State<NotificacionFormScreen> {
   final formKey = GlobalKey<FormState>();
   final tituloController = TextEditingController();
   final descripcionController = TextEditingController();
-  final tipoNotificacionController = TextEditingController();
-  final asignaturaController = TextEditingController();
-  final fechaHoraController = TextEditingController();
-  
+
   Notificacion? notificacion;
   bool esEdicion = false;
   DateTime fechaSeleccionada = DateTime.now();
-  TimeOfDay horaSeleccionada = TimeOfDay.now();
+
+  // Campos para prioridad y categoría
+  String prioridadSeleccionada = 'media';
+  String categoriaSeleccionada = 'trabajo';
+
+  final List<String> prioridades = ['alta', 'importante', 'media', 'baja'];
+  final List<String> categorias = ['trabajo', 'personal', 'estudio'];
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     final args = ModalRoute.of(context)?.settings.arguments;
-    if (args != null && args is Notificacion) {
+
+    print('DEBUG: Argumentos recibidos en formulario: $args');
+
+    // Verificar si viene una fecha seleccionada del calendario
+    if (args != null && args is Map<String, dynamic>) {
+      if (args.containsKey('selectedDate')) {
+        fechaSeleccionada = args['selectedDate'] as DateTime;
+        print(
+          'DEBUG: Fecha seleccionada del calendario: ${fechaSeleccionada.toIso8601String().split('T')[0]}',
+        );
+      }
+    }
+    // Verificar si es edición de una notificación existente
+    else if (args != null && args is Notificacion) {
       notificacion = args;
       esEdicion = true;
-      
+
       tituloController.text = notificacion!.titulo;
       descripcionController.text = notificacion!.descripcion;
-      tipoNotificacionController.text = notificacion!.tipo;
-      asignaturaController.text = notificacion!.asignatura;
-      
-      fechaSeleccionada = notificacion!.fechaHora;
-      horaSeleccionada = TimeOfDay.fromDateTime(notificacion!.fechaHora);
-      
-      _actualizarFechaHoraController();
-    } else {
-      _actualizarFechaHoraController();
+      prioridadSeleccionada = notificacion!.prioridad;
+      categoriaSeleccionada = notificacion!.categoria;
+      fechaSeleccionada = notificacion!.fecha;
+      print(
+        'DEBUG: Editando notificación existente con fecha: ${fechaSeleccionada.toIso8601String().split('T')[0]}',
+      );
     }
+
+    print(
+      'DEBUG: Fecha final a usar: ${fechaSeleccionada.toIso8601String().split('T')[0]}',
+    );
   }
 
   @override
   void dispose() {
     tituloController.dispose();
     descripcionController.dispose();
-    tipoNotificacionController.dispose();
-    asignaturaController.dispose();
-    fechaHoraController.dispose();
     super.dispose();
-  }
-
-  void _actualizarFechaHoraController() {
-    final fecha = DateTime(
-      fechaSeleccionada.year,
-      fechaSeleccionada.month,
-      fechaSeleccionada.day,
-    );
-    fechaHoraController.text = DateFormat('dd/MM/yyyy').format(fecha);
-  }
-
-  Future<void> _seleccionarFecha(BuildContext context) async {
-    final DateTime? fecha = await showDatePicker(
-      context: context,
-      initialDate: fechaSeleccionada,
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
-    );
-    
-    if (fecha != null) {
-      setState(() {
-        fechaSeleccionada = fecha;
-        _actualizarFechaHoraController();
-      });
-    }
   }
 
   InputDecoration customInputDecoration(IconData icon, String label) {
     return InputDecoration(
       prefixIcon: Icon(icon, color: Colors.orange.shade400),
       labelText: label,
-      labelStyle: TextStyle(
-        color: Colors.orange,
-        fontWeight: FontWeight.w600,
-      ),
+      labelStyle: TextStyle(color: Colors.orange, fontWeight: FontWeight.w600),
       filled: true,
       fillColor: Colors.orange.shade50,
       contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
@@ -138,11 +123,67 @@ class _NotificacionFormScreenState extends State<NotificacionFormScreen> {
     );
   }
 
+  Widget buildDropdownField(
+    String valorSeleccionado,
+    List<String> opciones,
+    IconData icon,
+    String label,
+    Function(String?) onChanged,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 22),
+      child: DropdownButtonFormField<String>(
+        decoration: customInputDecoration(icon, label),
+        value: valorSeleccionado,
+        onChanged: onChanged,
+        items:
+            opciones
+                .map(
+                  (opcion) => DropdownMenuItem<String>(
+                    child: Text(opcion),
+                    value: opcion,
+                  ),
+                )
+                .toList(),
+      ),
+    );
+  }
+
+  Color _getPrioridadColor(String prioridad) {
+    switch (prioridad) {
+      case 'alta':
+        return Colors.red;
+      case 'importante':
+        return Colors.orange;
+      case 'media':
+        return Colors.yellow;
+      case 'baja':
+        return Colors.green;
+      default:
+        return Colors.grey;
+    }
+  }
+
+  Color _getCategoriaColor(String categoria) {
+    switch (categoria) {
+      case 'trabajo':
+        return Colors.blue;
+      case 'personal':
+        return Colors.purple;
+      case 'estudio':
+        return Colors.pink;
+      default:
+        return Colors.grey;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(notificacion == null ? 'Crear Notificación' : 'Editar Notificación'),
+        title: Text(
+          notificacion == null ? 'Crear Notificación' : 'Editar Notificación',
+        ),
         backgroundColor: Colors.orange,
       ),
       body: Padding(
@@ -155,94 +196,183 @@ class _NotificacionFormScreenState extends State<NotificacionFormScreen> {
                 tituloController,
                 Icons.title,
                 "Título de la Notificación",
-                validator: (value) => 
-                    value == null || value.isEmpty 
-                        ? 'Campo requerido' 
-                        : null,
+                validator:
+                    (value) =>
+                        value == null || value.isEmpty
+                            ? 'Campo requerido'
+                            : null,
               ),
-              
+
               buildTextField(
                 descripcionController,
                 Icons.description,
                 "Descripción",
                 maxLines: 4,
-                validator: (value) => 
-                    value == null || value.isEmpty 
-                        ? 'Campo requerido' 
-                        : null,
+                validator:
+                    (value) =>
+                        value == null || value.isEmpty
+                            ? 'Campo requerido'
+                            : null,
               ),
-              
-              buildTextField(
-                asignaturaController,
-                Icons.school,
-                "Asignatura",
-                validator: (value) => 
-                    value == null || value.isEmpty 
-                        ? 'Campo requerido' 
-                        : null,
+
+              buildDropdownField(
+                prioridadSeleccionada,
+                prioridades,
+                Icons.priority_high,
+                "Prioridad",
+                (String? newValue) {
+                  setState(() {
+                    prioridadSeleccionada = newValue!;
+                  });
+                },
               ),
-              
-              buildTextField(
-                tipoNotificacionController,
+
+              buildDropdownField(
+                categoriaSeleccionada,
+                categorias,
                 Icons.category,
-                "Tipo de Notificación",
-                validator: (value) => 
-                    value == null || value.isEmpty 
-                        ? 'Campo requerido' 
-                        : null,
+                "Categoría",
+                (String? newValue) {
+                  setState(() {
+                    categoriaSeleccionada = newValue!;
+                  });
+                },
               ),
-              
-              buildTextField(
-                fechaHoraController,
-                Icons.calendar_today,
-                "Fecha (dd/MM/yyyy)",
-                validator: (value) => 
-                    value == null || value.isEmpty 
-                        ? 'Campo requerido' 
-                        : null,
-                onTap: () => _seleccionarFecha(context),
+
+              // Vista previa de la notificación
+              Container(
+                margin: const EdgeInsets.only(bottom: 30),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(15),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.2),
+                      blurRadius: 10,
+                      offset: const Offset(0, 5),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Vista Previa:',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: _getPrioridadColor(prioridadSeleccionada),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            prioridadSeleccionada.toUpperCase(),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: _getCategoriaColor(categoriaSeleccionada),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            categoriaSeleccionada.toUpperCase(),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      tituloController.text.isEmpty
+                          ? 'Título de la notificación'
+                          : tituloController.text,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      descripcionController.text.isEmpty
+                          ? 'Descripción de la notificación'
+                          : descripcionController.text,
+                      style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                    ),
+                  ],
+                ),
               ),
-              
+
               const SizedBox(height: 30),
               ElevatedButton(
                 onPressed: () async {
                   if (formKey.currentState!.validate()) {
-                    final fechaHora = DateTime(
-                      fechaSeleccionada.year,
-                      fechaSeleccionada.month,
-                      fechaSeleccionada.day,
-                      horaSeleccionada.hour,
-                      horaSeleccionada.minute,
+                    print(
+                      'DEBUG: Guardando notificación con fecha: ${fechaSeleccionada.toIso8601String().split('T')[0]}',
                     );
-                    
                     final nuevaNotificacion = Notificacion(
                       id: esEdicion ? notificacion!.id : null,
                       titulo: tituloController.text,
                       descripcion: descripcionController.text,
-                      tipo: tipoNotificacionController.text,
-                      asignatura: asignaturaController.text,
-                      fechaHora: fechaHora,
+                      prioridad: prioridadSeleccionada,
+                      categoria: categoriaSeleccionada,
+                      fecha: fechaSeleccionada,
                     );
-                    
+
                     try {
                       if (esEdicion) {
                         await NotificacionRepository.update(nuevaNotificacion);
+                        print('DEBUG: Notificación actualizada exitosamente');
                       } else {
                         await NotificacionRepository.insert(nuevaNotificacion);
+                        print('DEBUG: Notificación insertada exitosamente');
                       }
-                      
-                      if (mounted) {
-                        Navigator.pop(context, true);
-                      }
-                    } catch (e) {
-                      if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Error al guardar: $e'),
-                            backgroundColor: Colors.red,
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            esEdicion
+                                ? 'Notificación actualizada correctamente'
+                                : 'Notificación creada correctamente',
                           ),
-                        );
-                      }
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+
+                      Navigator.pop(context);
+                    } catch (e) {
+                      print('DEBUG: Error guardando notificación: $e');
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Error al guardar la notificación: $e'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
                     }
                   }
                 },
