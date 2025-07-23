@@ -29,16 +29,11 @@ class _NotificacionFormScreenState extends State<NotificacionFormScreen> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     final args = ModalRoute.of(context)?.settings.arguments;
-
-    print('DEBUG: Argumentos recibidos en formulario: $args');
-
+    
     // Verificar si viene una fecha seleccionada del calendario
     if (args != null && args is Map<String, dynamic>) {
       if (args.containsKey('selectedDate')) {
         fechaSeleccionada = args['selectedDate'] as DateTime;
-        print(
-          'DEBUG: Fecha seleccionada del calendario: ${fechaSeleccionada.toIso8601String().split('T')[0]}',
-        );
       }
     }
     // Verificar si es edición de una notificación existente
@@ -51,14 +46,7 @@ class _NotificacionFormScreenState extends State<NotificacionFormScreen> {
       prioridadSeleccionada = notificacion!.prioridad;
       categoriaSeleccionada = notificacion!.categoria;
       fechaSeleccionada = notificacion!.fecha;
-      print(
-        'DEBUG: Editando notificación existente con fecha: ${fechaSeleccionada.toIso8601String().split('T')[0]}',
-      );
     }
-
-    print(
-      'DEBUG: Fecha final a usar: ${fechaSeleccionada.toIso8601String().split('T')[0]}',
-    );
   }
 
   @override
@@ -70,19 +58,19 @@ class _NotificacionFormScreenState extends State<NotificacionFormScreen> {
 
   InputDecoration customInputDecoration(IconData icon, String label) {
     return InputDecoration(
-      prefixIcon: Icon(icon, color: Colors.orange.shade400),
+      prefixIcon: Icon(icon, color: Colors.blue),
       labelText: label,
-      labelStyle: TextStyle(color: Colors.orange, fontWeight: FontWeight.w600),
+      labelStyle: TextStyle(color: Colors.blue, fontWeight: FontWeight.w600),
       filled: true,
-      fillColor: Colors.orange.shade50,
+      fillColor: Colors.blue.shade50,
       contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(20),
-        borderSide: BorderSide(color: Colors.orange.shade100, width: 1.5),
+        borderSide: BorderSide(color: Colors.blue, width: 1.5),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(20),
-        borderSide: BorderSide(color: Colors.orange.shade300, width: 2.5),
+        borderSide: BorderSide(color: Colors.blue, width: 2.5),
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(20),
@@ -114,7 +102,7 @@ class _NotificacionFormScreenState extends State<NotificacionFormScreen> {
         onTap: onTap,
         decoration: customInputDecoration(icon, label),
         style: TextStyle(
-          color: Colors.orange,
+          color: Colors.blue,
           fontSize: 16,
           fontWeight: FontWeight.w500,
         ),
@@ -184,7 +172,7 @@ class _NotificacionFormScreenState extends State<NotificacionFormScreen> {
         title: Text(
           notificacion == null ? 'Crear Notificación' : 'Editar Notificación',
         ),
-        backgroundColor: Colors.orange,
+        backgroundColor: Colors.blue,
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 25),
@@ -332,9 +320,12 @@ class _NotificacionFormScreenState extends State<NotificacionFormScreen> {
               ElevatedButton(
                 onPressed: () async {
                   if (formKey.currentState!.validate()) {
-                    print(
-                      'DEBUG: Guardando notificación con fecha: ${fechaSeleccionada.toIso8601String().split('T')[0]}',
-                    );
+                    // Mostrar información de depuración
+                    print('=== DEBUG: Creando nueva notificación ===');
+                    print('Título: ${tituloController.text}');
+                    print('Fecha seleccionada: $fechaSeleccionada');
+                    print('Tipo de fecha: ${fechaSeleccionada.runtimeType}');
+                    
                     final nuevaNotificacion = Notificacion(
                       id: esEdicion ? notificacion!.id : null,
                       titulo: tituloController.text,
@@ -343,30 +334,18 @@ class _NotificacionFormScreenState extends State<NotificacionFormScreen> {
                       categoria: categoriaSeleccionada,
                       fecha: fechaSeleccionada,
                     );
+                    
+                    print('Notificación a guardar: ${nuevaNotificacion.toMap()}');
 
                     try {
                       if (esEdicion) {
                         await NotificacionRepository.update(nuevaNotificacion);
-                        print('DEBUG: Notificación actualizada exitosamente');
                       } else {
                         await NotificacionRepository.insert(nuevaNotificacion);
-                        print('DEBUG: Notificación insertada exitosamente');
                       }
-
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            esEdicion
-                                ? 'Notificación actualizada correctamente'
-                                : 'Notificación creada correctamente',
-                          ),
-                          backgroundColor: Colors.green,
-                        ),
-                      );
 
                       Navigator.pop(context);
                     } catch (e) {
-                      print('DEBUG: Error guardando notificación: $e');
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text('Error al guardar la notificación: $e'),
@@ -377,13 +356,13 @@ class _NotificacionFormScreenState extends State<NotificacionFormScreen> {
                   }
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.orange,
+                  backgroundColor: Colors.blue,
                   padding: const EdgeInsets.symmetric(vertical: 18),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30),
                   ),
                   elevation: 6,
-                  shadowColor: Colors.orange.shade200,
+                  shadowColor: Colors.blue.shade200,
                 ),
                 child: Text(
                   esEdicion ? 'Actualizar' : 'Guardar',

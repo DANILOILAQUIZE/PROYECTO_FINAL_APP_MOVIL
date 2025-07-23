@@ -381,7 +381,7 @@ class _NotificacionListScreenState extends State<NotificacionListScreen> {
                                       ),
                                     ),
                                     // Botones de acción
-                                    Row(
+                                    Column(
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
                                         Container(
@@ -411,7 +411,8 @@ class _NotificacionListScreenState extends State<NotificacionListScreen> {
                                             tooltip: 'Editar',
                                           ),
                                         ),
-                                        const SizedBox(width: 8),
+
+                                        const SizedBox(width: 8, height: 8),
                                         Container(
                                           decoration: BoxDecoration(
                                             color: Colors.red.shade50,
@@ -461,13 +462,20 @@ class _NotificacionListScreenState extends State<NotificacionListScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.pushNamed(context, "/notif_form").then((_) {
+          // Pasar la fecha seleccionada al formulario
+          Navigator.pushNamed(
+            context, 
+            "/notif_form",
+            arguments: {
+              'selectedDate': _fechaSeleccionada ?? DateTime.now(),
+            },
+          ).then((_) {
             setState(() {
               _loadNotificaciones();
             });
           });
         },
-        backgroundColor: Colors.orange,
+        backgroundColor: Colors.blue,
         child: const Icon(Icons.add, color: Colors.white),
       ),
     );
@@ -502,14 +510,6 @@ class _NotificacionListScreenState extends State<NotificacionListScreen> {
         setState(() {
           _loadNotificaciones();
         });
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Notificación eliminada exitosamente'),
-              backgroundColor: Colors.green,
-            ),
-          );
-        }
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
