@@ -6,12 +6,11 @@ class DBConnection {
       3; // Incrementado para reflejar cambios en el esquema (agregar tabla notificaciones)
   static const dbName = 'agenda_academica.db';
   static Future<Database> getDb() async {
-    
-    //final dbPath = await getDatabasesPath();
-    
-    //77final path = join(dbPath, dbName);
-    //await deleteDatabase(path);
-    final path = join(await getDatabasesPath(), dbName);
+    final dbPath = await getDatabasesPath();
+    final path = join(dbPath, dbName); // <-- AQUÍ defines el path correctamente
+
+    await deleteDatabase(path); // <-- AHORA puedes eliminar la base de datos
+
     return openDatabase(
       path,
       version: version,
@@ -29,14 +28,16 @@ class DBConnection {
 
         // Crear tabla de materias
         await db.execute('''
-          CREATE TABLE materia(
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            nombre TEXT NOT NULL,
-            codigo INTEGER NOT NULL,
-            descripcion TEXT NOT NULL,
-            horas INTEGER NOT NULL,
-            semestre TEXT NOT NULL
-          )
+            CREATE TABLE materia(
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              nombre TEXT NOT NULL,
+              codigo INTEGER NOT NULL,
+              descripcion TEXT NOT NULL,
+              horas INTEGER NOT NULL,
+              semestre TEXT NOT NULL,
+              fk_periodo_id INTEGER NOT NULL,
+              FOREIGN KEY(fk_periodo_id) REFERENCES periodo_academico(id)
+            )
         ''');
 
         // DATOS INICIALES
@@ -50,13 +51,13 @@ class DBConnection {
           'descripcion': 'Periodo académico actual',
         });
 
-        // Insertar algunas materias de ejemplo
         await db.insert('materia', {
           'nombre': 'Desarrollo Móvil',
           'codigo': 8001,
           'descripcion': 'Desarrollo de aplicaciones móviles con Flutter',
           'horas': 64,
           'semestre': '8vo Semestre',
+          'fk_periodo_id': 1,
         });
 
         // Crear tabla de notificaciones
@@ -88,13 +89,30 @@ class DBConnection {
           'tipo': 'tarea',
         });
 
-        await db.execute(
-          'CREATE TABLE tareas(id INTEGER PRIMARY KEY,  tema TEXT, materiaid TEXT, descripcion TEXT, fechaentrega TEXT, horaentrega TEXT, estado INTEGER)',
-        );
+        await db.execute('''
+          CREATE TABLE tareas(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            tema TEXT,
+            descripcion TEXT,
+            fechaentrega TEXT,
+            horaentrega TEXT,
+            estado INTEGER,
+            fk_materia_id INTEGER NOT NULL,
+            FOREIGN KEY(fk_materia_id) REFERENCES materia(id)
+          )
+        ''');
 
-        await db.execute(
-          "INSERT INTO tareas VALUES(1,'Programación','001MAT','Lógica de Programación','2025-07-01','10:30',1)",
-        );
+        final List<Map<String, dynamic>> materias = await db.query('materia');
+        final int materiaId = materias.first['id'];
+
+        await db.insert('tareas', {
+          'tema': 'Programación',
+          'descripcion': 'Lógica de Programación',
+          'fechaentrega': '2025-07-01',
+          'horaentrega': '10:30',
+          'estado': 1,
+          'fk_materia_id': materiaId,
+        });
       },
     );
   }
