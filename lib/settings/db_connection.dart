@@ -6,7 +6,7 @@ class DBConnection {
       3; // Incrementado para reflejar cambios en el esquema (agregar tabla notificaciones)
   static const dbName = 'agenda_academica.db';
   static Future<Database> getDb() async {
-    final dbPath = await getDatabasesPath();
+    //final dbPath = await getDatabasesPath();
 
     //final path = join(dbPath, dbName);
     //await deleteDatabase(path);

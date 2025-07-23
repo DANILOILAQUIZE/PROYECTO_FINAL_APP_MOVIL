@@ -31,4 +31,19 @@ class TareaRepository {
       );
     }
   }
+
+  static Future<Tareas?> getById(int id) async {
+    final result = await DBConnection.filter(tableName, 'id = ?', [id]);
+    if (result.isNotEmpty) {
+      return Tareas.fromMap(result.first);
+    }
+    return null;
+  }
+
+  static Future<List<Tareas>> getByMateriaId(int materiaId) async {
+    final result = await DBConnection.filter(tableName, 'fk_materia_id = ?', [
+      materiaId,
+    ]);
+    return result.map((item) => Tareas.fromMap(item)).toList();
+  }
 }

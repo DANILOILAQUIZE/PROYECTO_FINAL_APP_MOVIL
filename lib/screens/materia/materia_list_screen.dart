@@ -70,139 +70,154 @@ class _MateriaListScreenState extends State<MateriaListScreen> {
                             borderRadius: BorderRadius.circular(20),
                           ),
                           color: Colors.indigo.shade50,
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 10,
-                              horizontal: 8,
-                            ),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Container(
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        shape: BoxShape.circle,
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.indigo.withOpacity(
-                                              0.15,
-                                            ),
-                                            blurRadius: 8,
-                                            offset: Offset(0, 4),
-                                          ),
-                                        ],
-                                      ),
-                                      padding: const EdgeInsets.all(10),
-                                      child: Icon(
-                                        Icons.school,
-                                        color: Colors.indigo.shade700,
-                                        size: 30,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    SizedBox(
-                                      width: 70,
-                                      child: Text(
-                                        materia.nombre,
-                                        style: TextStyle(
-                                          color: Colors.indigo.shade900,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 15,
-                                          letterSpacing: 0.5,
-                                        ),
-                                        textAlign: TextAlign.center,
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(width: 18),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.center,
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(20),
+                            onTap: () {
+                              Navigator.pushNamed(
+                                context,
+                                '/gestionTareas',
+                                arguments: materia.id,
+                              );
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 10,
+                                horizontal: 8,
+                              ),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Column(
+                                    mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      Text(
-                                        "Código: ${materia.codigo}",
-                                        style: TextStyle(
-                                          color: Colors.indigo.shade400,
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w500,
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          shape: BoxShape.circle,
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.indigo.withOpacity(
+                                                0.15,
+                                              ),
+                                              blurRadius: 8,
+                                              offset: Offset(0, 4),
+                                            ),
+                                          ],
+                                        ),
+                                        padding: const EdgeInsets.all(10),
+                                        child: Icon(
+                                          Icons.school,
+                                          color: Colors.indigo.shade700,
+                                          size: 30,
                                         ),
                                       ),
-                                      const SizedBox(height: 2),
-                                      Text(
-                                        "Semestre: ${materia.semestre}",
-                                        style: TextStyle(
-                                          color: Colors.indigo.shade400,
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 2),
-                                      Text(
-                                        "Horas: ${materia.horas}",
-                                        style: TextStyle(
-                                          color: Colors.indigo.shade400,
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w500,
+                                      const SizedBox(height: 8),
+                                      SizedBox(
+                                        width: 70,
+                                        child: Text(
+                                          materia.nombre,
+                                          style: TextStyle(
+                                            color: Colors.indigo.shade900,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 15,
+                                            letterSpacing: 0.5,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
                                         ),
                                       ),
                                     ],
                                   ),
-                                ),
-                                Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Container(
-                                      decoration: BoxDecoration(
-                                        color: Colors.green.shade50,
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      child: IconButton(
-                                        onPressed: () {
-                                          Navigator.pushNamed(
-                                            context,
-                                            "/materias/form",
-                                            arguments:
-                                                materia, // <-- pasas la entidad completa
-                                          ).then((_) {
-                                            setState(() {
-                                              _loadMaterias();
+                                  const SizedBox(width: 18),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          "Código: ${materia.codigo}",
+                                          style: TextStyle(
+                                            color: Colors.indigo.shade400,
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          "Semestre: ${materia.semestre}",
+                                          style: TextStyle(
+                                            color: Colors.indigo.shade400,
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          "Horas: ${materia.horas}",
+                                          style: TextStyle(
+                                            color: Colors.indigo.shade400,
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          color: Colors.green.shade50,
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                        ),
+                                        child: IconButton(
+                                          onPressed: () {
+                                            Navigator.pushNamed(
+                                              context,
+                                              "/materias/form",
+                                              arguments:
+                                                  materia, // <-- pasas la entidad completa
+                                            ).then((_) {
+                                              setState(() {
+                                                _loadMaterias();
+                                              });
                                             });
-                                          });
-                                        },
+                                          },
 
-                                        icon: Icon(
-                                          Icons.edit,
-                                          color: Colors.green.shade700,
+                                          icon: Icon(
+                                            Icons.edit,
+                                            color: Colors.green.shade700,
+                                          ),
+                                          tooltip: 'Editar',
                                         ),
-                                        tooltip: 'Editar',
                                       ),
-                                    ),
-                                    const SizedBox(width: 6),
-                                    Container(
-                                      decoration: BoxDecoration(
-                                        color: Colors.red.shade50,
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      child: IconButton(
-                                        onPressed: () => eliminar(materia),
-                                        icon: Icon(
-                                          Icons.delete,
-                                          color: Colors.red.shade700,
+                                      const SizedBox(width: 6),
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          color: Colors.red.shade50,
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
                                         ),
-                                        tooltip: 'Eliminar',
+                                        child: IconButton(
+                                          onPressed: () => eliminar(materia),
+                                          icon: Icon(
+                                            Icons.delete,
+                                            color: Colors.red.shade700,
+                                          ),
+                                          tooltip: 'Eliminar',
+                                        ),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                              ],
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         );

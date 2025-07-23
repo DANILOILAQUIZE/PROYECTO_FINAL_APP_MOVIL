@@ -13,12 +13,11 @@ class TareaFormScreen extends StatefulWidget {
 class _TareaFormScreenState extends State<TareaFormScreen> {
   final formKey = GlobalKey<FormState>();
   final temaController = TextEditingController();
-  final materiaController = TextEditingController();
   final descripcionController = TextEditingController();
   final fechaentregaController = TextEditingController();
   final horaentregaController = TextEditingController();
   final estadoController = TextEditingController();
-
+  int? fkMateriaId;
   Tareas? t;
 
   @override
@@ -29,11 +28,13 @@ class _TareaFormScreenState extends State<TareaFormScreen> {
       // llenar las cajas de texto
       t = args;
       temaController.text = t!.tema;
-      materiaController.text = t!.materiaid;
       descripcionController.text = t!.descripcion;
       fechaentregaController.text = t!.fechaentrega;
       horaentregaController.text = t!.horaentrega;
       estadoController.text = t!.estado.toString();
+      fkMateriaId = t!.fkMateriaId;
+    } else if (args is int) {
+      fkMateriaId = args;
     }
   }
 
@@ -65,21 +66,7 @@ class _TareaFormScreenState extends State<TareaFormScreen> {
                     border: OutlineInputBorder(),
                   ),
                 ),
-                SizedBox(height: 25),
-                TextFormField(
-                  controller: materiaController,
-                  validator:
-                      (value) =>
-                          value == null || value.isEmpty
-                              ? 'campo requerido'
-                              : null,
-                  decoration: InputDecoration(
-                    suffixIcon: Icon(Icons.person),
-                    suffixIconColor: Colors.green,
-                    labelText: "Materia",
-                    border: OutlineInputBorder(),
-                  ),
-                ),
+
                 SizedBox(height: 25),
                 TextFormField(
                   controller: descripcionController,
@@ -161,11 +148,11 @@ class _TareaFormScreenState extends State<TareaFormScreen> {
       final tarea = Tareas(
         id: t?.id,
         tema: temaController.text,
-        materiaid: materiaController.text,
         descripcion: descripcionController.text,
         fechaentrega: fechaentregaController.text,
         horaentrega: horaentregaController.text,
         estado: int.tryParse(estadoController.text) ?? 0,
+        fkMateriaId: fkMateriaId!,
       );
       if (tarea.id != null) {
         await TareaRepository.update(tarea);
